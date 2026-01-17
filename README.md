@@ -33,7 +33,7 @@ Built for the **ByteSize Hackathon**, it uses advanced AI to analyze audio energ
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/Palguni28/PulsePoint-AI-Hackathon.git](https://github.com/Palguni28/PulsePoint-AI-Hackathon.git)
+    git clone https://github.com/Palguni28/PulsePoint-AI-Hackathon.git
     cd PulsePoint-AI-Hackathon
     ```
 
