@@ -38,8 +38,8 @@ class AudioAnalyzer:
         # Strategy: specific 60s windows with highest average energy
         print("[*] Identifying Viral Moments (High Energy)...")
         
-        window_size_sec = 45 # Target clip length
-        step_size_sec = 15   # Overlap
+        window_size_sec = 60 # Target clip length (User requested 30-60s)
+        step_size_sec = 20   # Overlap
         
         clips = []
         

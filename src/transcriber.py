@@ -9,7 +9,7 @@ class Transcriber:
         # Reuse existing env
         api_key = os.getenv("GOOGLE_API_KEY")
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.0-flash-lite')
+        self.model = genai.GenerativeModel('gemini-2.0-flash')
 
     def transcribe_clip(self, audio_path):
         """
@@ -42,13 +42,19 @@ class Transcriber:
         RETURN JSON ONLY.
         """
         
-        try:
-            response = self.model.generate_content([audio_file, prompt])
-            text = response.text.replace("```json", "").replace("```", "").strip()
-            captions = json.loads(text)
-            return captions
-        except Exception as e:
-            print(f"[!] Transcription error: {e}")
-            if hasattr(response, 'text'):
-                print(f"Raw: {response.text}")
-            return []
+        retries = 3
+        for attempt in range(retries):
+            try:
+                response = self.model.generate_content([audio_file, prompt])
+                text = response.text.replace("```json", "").replace("```", "").strip()
+                captions = json.loads(text)
+                return captions
+            except Exception as e:
+                if "429" in str(e):
+                    print(f"[!] Rate Limit (429). Retrying in 60s... ({attempt+1}/{retries})")
+                    time.sleep(60)
+                else:
+                    print(f"[!] Transcription error: {e}")
+                    return []
+        print("[!] Max retries exceeded.")
+        return []

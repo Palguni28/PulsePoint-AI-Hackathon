@@ -4,7 +4,11 @@ from content_analyzer import ContentAnalyzer
 from vision_engine import VisionEngine
 from transcriber import Transcriber
 import cv2
+import cv2
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def process_video(video_path):
     print(f"=== PROCESSING: {video_path} ===")
@@ -12,16 +16,18 @@ def process_video(video_path):
     # 1. Validation
     if not os.path.exists(video_path):
         print(f"[!] Error: Input file not found at {video_path}")
-        return
+        return []
 
     # 2. Logic Phase (Librosa Audio Analysis)
     from audio_analyzer import AudioAnalyzer
     analyzer = AudioAnalyzer()
     best_segments = analyzer.get_best_clips(video_path)
     
+    generated_files = []
+
     if not best_segments:
         print("[!] No clips found. Check API Key or Input Video.")
-        return
+        return []
 
     # 3. Vision & Captioning Phase
     vision = VisionEngine()
@@ -29,6 +35,9 @@ def process_video(video_path):
     original_clip = VideoFileClip(video_path)
     
     print(f"=== RENDERING {len(best_segments)} CLIPS ===")
+    
+    # Rate Limit Sleep
+    import time
 
     for i, seg in enumerate(best_segments):
         start = seg['start']
@@ -77,11 +86,23 @@ def process_video(video_path):
             for k in range(0, len(captions), group_size):
                 chunk = captions[k:k+group_size]
                 if chunk:
-                    # Extend end time of group to match start of next group? 
-                    # For now just use word bounds.
+                    # Look ahead for next chunk start to bridge gap
+                    next_start = 0
+                    if k + group_size < len(captions):
+                        next_start = captions[k+group_size].get('start', 0)
+                    else:
+                        next_start = chunk[-1].get('end', 0) + 1.5 # Last chunk lingers
+                        
+                    current_end = chunk[-1].get('end', 0)
+                    # Extend end time to next start if gap is small (< 3 sec)
+                    if next_start > current_end and (next_start - current_end) < 3.0:
+                        group_end = next_start
+                    else:
+                        group_end = current_end + 0.5
+
                     word_groups.append({
                         'start': chunk[0].get('start', 0),
-                        'end': chunk[-1].get('end', 0),
+                        'end': group_end,
                         'words': chunk
                     })
 
@@ -99,7 +120,7 @@ def process_video(video_path):
             if active_group:
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 scale = 1.0
-                thickness = 3
+                thickness = 2
                 spacing = 20
                 
                 # Measure total width
@@ -112,25 +133,35 @@ def process_video(video_path):
                     total_width += sz[0] + spacing
                 total_width -= spacing
                 
-                # Draw
+                # Coordinates
                 start_x = (frame.shape[1] - total_width) // 2
                 y = int(frame.shape[0] * 0.85)
                 
+                # 1. Background Box (Semi-transparent Black)
+                padding = 20
+                box_x1 = start_x - padding
+                box_y1 = y - sizes[0][1] - padding
+                box_x2 = start_x + total_width + padding
+                box_y2 = y + padding
+                
+                overlay = frame.copy()
+                cv2.rectangle(overlay, (box_x1, box_y1), (box_x2, box_y2), (0, 0, 0), -1)
+                alpha = 0.6
+                cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+                
+                # 2. Draw Words (Pop-in Style)
                 curr_x = start_x
                 for i, w in enumerate(active_group['words']):
                     w_text = w.get('word', '')
                     sz = sizes[i]
                     
-                    # Highlight active word
-                    # Color: BGR
-                    color = (255, 255, 255) # White
-                    if w.get('start', 0) <= t <= w.get('end', 0):
-                        color = (0, 255, 255) # Yellow (B=0, G=255, R=255)
-                    
-                    # Outline
-                    cv2.putText(frame, w_text, (curr_x, y), font, scale, (0,0,0), thickness+3, cv2.LINE_AA)
-                    # Text
-                    cv2.putText(frame, w_text, (curr_x, y), font, scale, color, thickness, cv2.LINE_AA)
+                    # Pop-in logic: Only draw if current time >= start of word
+                    if t >= w.get('start', 0):
+                        color = (255, 255, 255) # White
+                        # Outline
+                        # cv2.putText(frame, w_text, (curr_x, y), font, scale, (0,0,0), thickness+2, cv2.LINE_AA)
+                        # Text
+                        cv2.putText(frame, w_text, (curr_x, y), font, scale, color, thickness, cv2.LINE_AA)
                     
                     curr_x += sz[0] + spacing
             
@@ -151,12 +182,17 @@ def process_video(video_path):
                 logger=None,
                 fps=24 # Enforce FPS
             )
-            print(f"[+] Saved: {output_filename}")
+            generated_files.append(output_filename)
         except Exception as e:
             print(f"[!] Rendering Error: {e}")
+            
+        # Avoid Rate Limits
+        print("[*] Sleeping 60s for API Rate Limit...")
+        time.sleep(60)
 
     original_clip.close()
     print("=== PIPELINE COMPLETE ===")
+    return generated_files
 
 if __name__ == "__main__":
     # Point to your downloaded video

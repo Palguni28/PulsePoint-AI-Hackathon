@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PulsePoint AI - Viral Clip Generator</title>
+    <!-- Pico.css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        .container { max-width: 800px; padding-top: 2rem; }
+        .grid-video { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        video { width: 100%; border-radius: 8px; }
+        .spinner { display: none; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <hgroup>
+            <h1>PulsePoint AI</h1>
+            <h2>Turn long videos into viral shorts instantly.</h2>
+        </hgroup>
+
+        <!-- Upload Form -->
+        <article>
+            <form method="post" enctype="multipart/form-data" onsubmit="document.getElementById('loading').style.display='block'">
+                <label for="file">Select Video File (MP4)</label>
+                <input type="file" id="file" name="file" accept=".mp4" required>
+                <button type="submit">Generate Viral Reels</button>
+            </form>
+            
+            <div id="loading" class="spinner">
+                <p aria-busy="true">Processing video... This may take a few minutes (Analysis + AI Transcription + Rendering).</p>
+            </div>
+            
+            {% if error %}
+            <div role="alert" style="background-color: #d93526; color: white; padding: 1rem; border-radius: 4px;">
+                {{ error }}
+            </div>
+            {% endif %}
+        </article>
+
+        <!-- Results -->
+        {% if videos %}
+        <section>
+            <h3>Generated Reels</h3>
+            <div class="grid-video">
+                {% for video in videos %}
+                <article>
+                    <header>{{ video }}</header>
+                    <video controls>
+                        <source src="{{ url_for('uploaded_file', filename=video) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <footer style="text-align: center;">
+                        <a href="{{ url_for('uploaded_file', filename=video) }}" role="button" class="secondary" download>Download</a>
+                    </footer>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        
+    </main>
+</body>
+</html>
