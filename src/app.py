@@ -5,8 +5,9 @@ from main import process_video
 app = Flask(__name__)
 
 # Config
-UPLOAD_FOLDER = 'inputs'
-OUTPUT_FOLDER = 'outputs'
+BASE_DIR = os.getcwd() # Get current working directory (where python is run from)
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'inputs')
+OUTPUT_FOLDER = os.path.join(BASE_DIR, 'outputs')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 
