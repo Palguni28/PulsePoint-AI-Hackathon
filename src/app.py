@@ -67,7 +67,13 @@ def index():
 
 @app.route('/outputs/<filename>')
 def uploaded_file(filename):
+    # For video tag (inline playback)
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    # For download button (force save)
+    return send_from_directory(app.config['OUTPUT_FOLDER'], filename, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

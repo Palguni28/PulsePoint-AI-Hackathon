@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -8,58 +8,313 @@
     <!-- Pico.css -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <style>
-        .container {
-            max-width: 800px;
-            padding-top: 2rem;
+        :root {
+            --primary: #e91e63;
+            --primary-hover: #c2185b;
         }
 
+        [data-theme="dark"] {
+            --background-color: #0f0f13;
+            --card-background-color: rgba(30, 30, 35, 0.6);
+            --gradient-1: rgba(233, 30, 99, 0.1);
+            --gradient-2: rgba(33, 150, 243, 0.1);
+            --muted-border-color: #333;
+            --color: #eee;
+        }
+
+        [data-theme="light"] {
+            --background-color: #ffffff;
+            --card-background-color: rgba(255, 255, 255, 0.8);
+            --gradient-1: rgba(233, 30, 99, 0.05);
+            --gradient-2: rgba(33, 150, 243, 0.05);
+            --muted-border-color: #ccc;
+            --color: #333;
+        }
+
+        body {
+            background-color: var(--background-color);
+            background-image: radial-gradient(circle at 10% 20%, var(--gradient-1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, var(--gradient-2) 0%, transparent 20%);
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 900px;
+            padding-top: 3rem;
+        }
+
+        /* Navbar / Theme Toggle */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            padding-bottom: 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #FF3D77, #338AFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .hero h2 {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        /* Glassmorphism Cards */
+        article {
+            background: var(--card-background-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--muted-border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Grid for Videos */
         .grid-video {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         video {
             width: 100%;
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--muted-border-color);
+        }
+
+        /* Spinner */
+        .spinner-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
         }
 
         .spinner {
+            border: 4px solid var(--muted-border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Form Layout */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            opacity: 0.6;
+            margin: 2rem 0;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--muted-border-color);
+        }
+
+        .or-divider:not(:empty)::before {
+            margin-right: .5em;
+        }
+
+        .or-divider:not(:empty)::after {
+            margin-left: .5em;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #FF3D77, #338AFF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .hero h2 {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        /* Glassmorphism Cards */
+        article {
+            background: var(--card-background-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--muted-border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Grid for Videos */
+        .grid-video {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--muted-border-color);
+        }
+
+        /* Spinner */
+        .spinner-container {
             display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid var(--muted-border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Form Layout */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            opacity: 0.6;
+            margin: 2rem 0;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--muted-border-color);
+        }
+
+        .or-divider:not(:empty)::before {
+            margin-right: .5em;
+        }
+
+        .or-divider:not(:empty)::after {
+            margin-left: .5em;
         }
     </style>
 </head>
 
 <body>
-    <main class="container">
-        <hgroup>
-            <h1>PulsePoint AI</h1>
-            <h2>Turn long videos into viral shorts instantly.</h2>
-        </hgroup>
+    <nav class="container top-nav">
+        <ul></ul>
+        <ul>
+            <li>
+                <a href="#" role="button" class="outline contrast" onclick="toggleTheme()" id="theme-btn"
+                    style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                    Switch Theme 🌓
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="container" style="padding-top: 1rem;">
+
+        <!-- Hero -->
+        <div class="hero">
+            <hgroup>
+                <h1>PulsePoint AI</h1>
+                <h2>Turn long videos into viral shorts instantly.</h2>
+            </hgroup>
+            <p>
+                <b>How it Works:</b> Upload a video. Our AI analyzes audio energy to find viral moments
+                and uses face tracking to auto-crop for mobile (9:16).
+            </p>
+        </div>
 
         <!-- Upload Form -->
         <article>
+            <header><strong>📊 Start Generating</strong></header>
             <form method="post" enctype="multipart/form-data"
                 onsubmit="document.getElementById('loading').style.display='block'">
-                <label for="file">Select Video File (MP4)</label>
-                <input type="file" id="file" name="file" accept=".mp4">
 
-                <div style="text-align: center; margin: 1rem 0;">OR</div>
+                <div class="input-group">
+                    <label for="file">📂 Upload Local Video (MP4)</label>
+                    <input type="file" id="file" name="file" accept=".mp4">
+                    <small>Best for files on your computer.</small>
+                </div>
 
-                <label for="drive_url">Paste Google Drive Link</label>
-                <input type="text" id="drive_url" name="drive_url" placeholder="https://drive.google.com/file/d/...">
+                <div class="or-divider">OR</div>
 
-                <button type="submit">Generate Viral Reels</button>
+                <div class="input-group">
+                    <label for="drive_url">🔗 Import from Google Drive</label>
+                    <input type="text" id="drive_url" name="drive_url"
+                        placeholder="https://drive.google.com/file/d/...">
+                    <small>Paste a <b>Public</b> Google Drive link.</small>
+                </div>
+
+                <button type="submit" class="contrast">✨ Generate Viral Reels</button>
             </form>
 
-            <div id="loading" class="spinner">
-                <p aria-busy="true">Processing video... This may take a few minutes (Analysis + AI Transcription +
-                    Rendering).</p>
+            <!-- Loading State -->
+            <div id="loading" class="spinner-container">
+                <div class="spinner"></div>
+                <p><b>Analysis in Progress...</b><br>Finding viral moments and tracking faces.<br>Please allow 3-5
+                    minutes.</p>
             </div>
 
             {% if error %}
-            <div role="alert" style="background-color: #d93526; color: white; padding: 1rem; border-radius: 4px;">
-                {{ error }}
+            <div role="alert"
+                style="background-color: rgba(217, 53, 38, 0.2); border: 1px solid #d93526; color: #ff8a80; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                ⚠️ {{ error }}
             </div>
             {% endif %}
         </article>
@@ -67,18 +322,22 @@
         <!-- Results -->
         {% if videos %}
         <section>
-            <h3>Generated Reels</h3>
+            <h3 style="text-align: center; margin-top: 3rem;">🎉 Your Viral Clips</h3>
             <div class="grid-video">
                 {% for video in videos %}
-                <article>
-                    <header>{{ video }}</header>
-                    <video controls>
+                <article style="padding: 0; overflow: hidden;">
+                    <video controls preload="metadata">
                         <source src="{{ url_for('uploaded_file', filename=video) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <footer style="text-align: center;">
-                        <a href="{{ url_for('uploaded_file', filename=video) }}" role="button" class="secondary"
-                            download>Download</a>
+                    <footer style="padding: 1rem; background: rgba(0,0,0,0.05);">
+                        <div class="grid">
+                            <div
+                                style="align-self: center; font-size: 0.9em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                {{ video }}</div>
+                            <a href="{{ url_for('download_file', filename=video) }}" role="button"
+                                class="secondary outline" download style="padding: 0.5rem;">Download ⬇️</a>
+                        </div>
                     </footer>
                 </article>
                 {% endfor %}
@@ -87,6 +346,15 @@
         {% endif %}
 
     </main>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+        }
+    </script>
 </body>
 
 </html>

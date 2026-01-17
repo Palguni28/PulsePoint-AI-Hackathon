@@ -7,7 +7,10 @@ class AudioAnalyzer:
     def __init__(self):
         print("[*] Initializing Librosa Audio Analyzer...")
 
-    def get_best_clips(self, video_path: str):
+    def get_best_clips(self, video_path: str, window_size_sec=45, step_size_sec=15):
+        """
+        Analyzes audio energy and returns the top 3 high-energy windows.
+        """
         print(f"[*] Extracting audio from {os.path.basename(video_path)}...")
         
         # 1. Extract Audio to temporary file
