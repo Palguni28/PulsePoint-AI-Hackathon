@@ -1,0 +1,14 @@
+# Security
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Large Files (The Fix)
+*.mp4
+*.wav
+inputs/
+outputs/
