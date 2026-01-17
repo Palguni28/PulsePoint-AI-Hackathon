@@ -14,24 +14,44 @@ app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
+import gdown
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     generated_videos = []
     loading = False
     
     if request.method == 'POST':
-        if 'file' not in request.files:
-            return render_template('index.html', error='No file part')
+        filename = None
+        filepath = None
         
-        file = request.files['file']
-        if file.filename == '':
-            return render_template('index.html', error='No selected file')
-            
-        if file:
+        # 1. Check for File Upload
+        if 'file' in request.files and request.files['file'].filename != '':
+            file = request.files['file']
             filename = file.filename
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             
+        # 2. Check for Google Drive Link
+        elif 'drive_url' in request.form and request.form['drive_url'].strip() != '':
+            url = request.form['drive_url'].strip()
+            try:
+                # Generate a unique name or trust gdown to detect name
+                output_path = os.path.join(app.config['UPLOAD_FOLDER'], "drive_video.mp4")
+                # gdown.download returns the filename
+                downloaded = gdown.download(url, output_path, quiet=False, fuzzy=True)
+                if downloaded:
+                    filepath = downloaded
+                    filename = os.path.basename(downloaded)
+                else:
+                    return render_template('index.html', error='Failed to download from Google Drive.')
+            except Exception as e:
+                return render_template('index.html', error=f'GDown Error: {str(e)}')
+        
+        else:
+            return render_template('index.html', error='No file or link provided.')
+            
+        if filepath:
             # Process
             try:
                 # process_video returns absolute or relative paths
