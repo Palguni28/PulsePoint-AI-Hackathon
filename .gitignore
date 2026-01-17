@@ -8,7 +8,29 @@ venv/
 .venv/
 
 # Large Files (The Fix)
+# Large Files
 *.mp4
 *.wav
 inputs/
 outputs/
+
+# Logs & Tests
+*.log
+debug_log.txt
+flask_log.txt
+pipeline_log*.txt
+test_output.txt
+
+# System
+.DS_Store
+Thumbs.db
+
+# Environments
+env/
+.env.local
+
+# Build
+build/
+dist/
+*.egg-info/
+.pytest_cache/
